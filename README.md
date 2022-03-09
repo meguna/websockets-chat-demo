@@ -25,6 +25,7 @@ What if the server realizes it has new information and wants to give it to the c
 - We can emulate thise behavior using "long polling" - essentially, manually choose to leave the connection open way longer after the first message was sent from the server to the client.
   - downsides: can be pretty burdensome on the server (one process per connection), tends to not scale well for bigger projects, consumes more resources, and can cause duplicate date on client-side.
 - WebSockets was created as a way to directly respond to this situation, establishing real two-way communcation between clients and servers.
+- Note that in web programming, the role of "client" and "server" are fixed - you always have a service that acts as the client, and a service that acts as the server, and that is how we communicate. 
 
 ## File Structure
 - app.py: contains the server loop and server functions (functions that update the state of the server).
