@@ -156,12 +156,8 @@ function receiveRequest(websocket) {
     const event = JSON.parse(data);
     switch (event.type) {
       case "init":
-        const params = new URLSearchParams(window.location.search);
-        let joinLink = document.location + "?join=" + event.joinKey;
-        if (params.has("join")) {
-          joinLink = params.get("join");
-        }
-        document.getElementById('name-span').innerHTML = event.userId;
+        ...
+        document.getElementById('name-span').innerHTML = event.userId;      # update the text inside the HTML element with the identifier "name-span"
         displayText(`chat started; join: ${joinLink}`);
         break;
       case "talk":
@@ -173,4 +169,4 @@ function receiveRequest(websocket) {
 }
 ```
 - Uses the event listener "message", so this code will run every time the WebSocket receives a message.
-- Based on what the server sends us, we manipulate the GUI with the `displayText` function (also implemented in `main.js`)
+- Based on what the server sends us, we manipulate the GUI with the `displayText` function (also implemented in `main.js`) or with other inbuilt functions
