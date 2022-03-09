@@ -54,20 +54,13 @@ Some key vocabulary terms here:
 
 ```
 async def handler(websocket, path):
-    """
-    Handle a connection and dispatch it according to who is connecting.
-
-    """
-    # Receive and parse the "init" event from the UI.
-    message = await websocket.recv()
+    message = await websocket.recv()                    # Receive and parse the "init" event from the GUI.
     event = json.loads(message)
     assert event["type"] == "init"
 
-    if "joinKey" in event:
-        # Second person joins an existing chat.
+    if "joinKey" in event:                              # Second person joins an existing chat.
         await join(websocket, event["joinKey"])
     else:
-        # First person starts a new chat.
-        await start(websocket)
+        await start(websocket)                          # First person starts a new chat.
 ```
 
