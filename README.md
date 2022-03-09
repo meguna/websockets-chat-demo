@@ -55,7 +55,7 @@ Some key vocabulary terms here:
 ```
 async def handler(websocket):
     message = await websocket.recv()                    # Receive and parse the "init" event from the GUI.
-    event = json.loads(message)                         # parse a string containing JSON and convert it to a JS object (loads = load string)
+    event = json.loads(message)                         # parse a string containing JSON and convert it to a dict (loads = load string)
     assert event["type"] == "init"
 
     if "joinKey" in event:                              # Second person joins an existing chat.
