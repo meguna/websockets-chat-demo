@@ -23,6 +23,7 @@ Websites by default use HTTP connections to communicate between a client and a s
 What if the server realizes it has new information and wants to give it to the client?
 - In traditional HTTP, we can't do this. 
 - We can emulate thise behavior using "long polling" - essentially, manually choose to leave the connection open way longer after the first message was sent from the server to the client.
+  - downsides: can be pretty burdensome on the server (one process per connection), tends to not scale well for bigger projects, consumes more resources, and can cause duplicate date on client-side.
 - WebSockets was created as a way to directly respond to this situation, establishing real two-way communcation between clients and servers.
 
 ## File Structure
