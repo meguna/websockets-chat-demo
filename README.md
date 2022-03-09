@@ -109,6 +109,7 @@ async def send_chat(websocket, chat, userId, connected):
           event = {"type": "talk", **messageDetails}
           websockets.broadcast(connected, json.dumps(event))
 ```
+- similar to the server loop we saw earlier in Erlang - but for now we're only listening for one type of message
 - `async for`: a for loop that allows you to call asynchronous code at each iteration. NOT concurrent - just lets the "caller" coroutine do other things while waiting for its asynchronous results. ie, it does not block the event loop.
 - `chat.add_message` just adds messages to the in-memory Chat instance
 - [`websockets.broadcast()` spec](https://websockets.readthedocs.io/en/stable/reference/utilities.html?highlight=broadcast#websockets.broadcast): send a message to a list of users
