@@ -7,11 +7,7 @@ import secrets
 import websockets
 from time import time
 
-DEFAULT_USER = 'chatmaster'
-
 JOIN = {}
-
-WATCH = {}
 
 class Chat():
   def __init__(self):
@@ -36,7 +32,7 @@ async def error(websocket, message):
 
 async def replay(websocket, chat):
     """
-    Send previous moves.
+    Send previous messages.
 
     """
     # Make a copy to avoid an exception if chat.moves changes while iteration
@@ -59,7 +55,7 @@ async def send_chat(websocket, chat, userId, connected):
 
     """
     async for message in websocket:
-        # Parse a "play" event from the UI.
+        # Parse a "talk" event from the UI.
         event = json.loads(message)
         if event["type"] == "talk":
           payload = event["payload"]
@@ -67,14 +63,14 @@ async def send_chat(websocket, chat, userId, connected):
 
           messageDetails = {"payload": payload, "userId": userId, "time": time()}
           try:
-              # Play the move.
+              # Send the chat message.
               chat.add_message(messageDetails)
           except RuntimeError as exc:
-              # Send an "error" event if the move was illegal.
+              # Send an "error" event if something goes wrong. 
               await error(websocket, str(exc))
               continue
 
-          # Send a "play" event to update the UI.
+          # Send a "talk" event to update the UI.
           event = {"type": "talk", **messageDetails}
           websockets.broadcast(connected, json.dumps(event))
 
@@ -91,6 +87,7 @@ async def start(websocket):
 
     join_key = secrets.token_urlsafe(12)
     JOIN[join_key] = chat, connected
+    userId = len(connected)
 
     try:
         # Send the secret access tokens to the browser of the first person,
@@ -98,18 +95,18 @@ async def start(websocket):
         event = {
             "type": "init",
             "joinKey": join_key,
-            "userId": len(connected)
+            "userId": userId
         }
         await websocket.send(json.dumps(event))
         # Receive and process moves from the first player.
-        await send_chat(websocket, chat, DEFAULT_USER, connected)
+        await send_chat(websocket, chat, userId, connected)
     finally:
         del JOIN[join_key]
 
 
 async def join(websocket, join_key):
     """
-    Handle a connection from the second player: join an existing game.
+    Handle a connection from new chat members - join a chatroom
 
     """
     # find the chat in Python memory.
@@ -140,7 +137,7 @@ async def join(websocket, join_key):
         connected.remove(websocket)
 
 
-async def handler(websocket, path):
+async def handler(websocket):
     """
     Handle a connection and dispatch it according to who is connecting.
 
@@ -159,7 +156,7 @@ async def handler(websocket, path):
 
 
 async def main():
-    async with websockets.serve(handler, "", 8001):
+    async with websockets.serve(handler, "", 8001): 
         await asyncio.Future()  # run forever
 
 
