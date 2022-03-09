@@ -37,14 +37,31 @@ What if the server realizes it has new information and wants to give it to the c
 ### App.py: Server Loop
 ```
 async def main():
-    async with websockets.serve(handler, "", 8001):       # run the websockets 
+    async with websockets.serve(handler, "", 8001):       # start a websockets server. server listens on port 8001
         await asyncio.Future()                            # run forever
 ```
 - We use the `websockets` library for this project
 - `websockets` is based on the Python standard library `asyncio` 
+- [`websockets.serve()` spec](https://websockets.readthedocs.io/en/stable/reference/server.html#starting-a-server)
+- `handler`: name of function (described below)
 
 Some key vocabulary terms here:
 - `asyncio` is based on coroutines, which are basically like Python functions where you can choose to stop execution at certain checkpoints within the function, and resume execution from that stopped checkpoint later. 
 - `async def ...` defines a coroutine.
 - `await f()...` are statements that should only be used within coroutine functions, and will pause execution of the "caller" coroutine and waits for the execution of the `f()` to complete first before proceeding.
 
+### App.py: handler function
+
+```
+async def handler(websocket):
+    message = await websocket.recv()                    # Receive and parse the "init" event from the GUI.
+    event = json.loads(message)                         # parse a string containing JSON and convert it to a dict (loads = load string)
+    assert event["type"] == "init"
+
+    if "joinKey" in event:                              # Second person joins an existing chat.
+        await join(websocket, event["joinKey"])
+    else:
+        await start(websocket)                          # First person starts a new chat.
+```
+- `await websocket.recv()`: receive one message from the websocket. Since the GUI sends the first message with `{type: "init"}`, the assertion two lines below holds.
+- depending on whether the user is starting a chatroom or joining one, handle the initialization request with either the `join()` or `start()` function (also in `app.py`).
