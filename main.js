@@ -10,7 +10,7 @@ function initChat(websocket) {
   });
 }
 
-function showMessage(message, userId="") {
+function displayText(message, userId="") {
   const timestamp = Date.now();
   const messageElement = document.createElement("p");
   messageElement.innerHTML = userId !== "" ? `User ${userId}: ${message}` : message;
@@ -24,7 +24,7 @@ function removeMessage(messageId) {
   messageElement.remove();
 }
 
-function receiveRequest(websocket) {
+function receiveWebsocketMessage(websocket) {
   websocket.addEventListener("message", ({ data }) => {
     const event = JSON.parse(data);
     switch (event.type) {
@@ -35,17 +35,17 @@ function receiveRequest(websocket) {
           joinLink = params.get("join");
         }
         document.getElementById('name-span').innerHTML = event.userId;
-        showMessage(`chat started; join: ${joinLink}`);
+        displayText(`chat started; join: ${joinLink}`);
         break;
       case "talk":
-        showMessage(event.payload, event.userId);
+        displayText(event.payload, event.userId);
         break;
       case "quit":
-        showMessage(event.player + "has left the chat.");
+        displayText(event.player + "has left the chat.");
         websocket.close(1000);
         break;
       case "error":
-        showMessage(event.payload);
+        displayText(event.payload);
         break;
       default:
         throw new Error(`Unsupported event type: ${event.type}.`);
@@ -74,6 +74,6 @@ window.addEventListener("DOMContentLoaded", () => {
   // Open the WebSocket connection and register event handlers.
   const websocket = new WebSocket("ws://localhost:8001/");
   initChat(websocket);
-  receiveRequest(websocket);
+  receiveWebsocketMessage(websocket);
   sendTalk(websocket);
 });

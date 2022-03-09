@@ -51,10 +51,10 @@ async def replay(websocket, chat):
 
 async def send_chat(websocket, chat, userId, connected):
     """
-    Receive and process moves from a player.
+    Receive and process chat messages from a user.
 
     """
-    async for message in websocket:
+    async for message in websocket: 
         # Parse a "talk" event from the UI.
         event = json.loads(message)
         if event["type"] == "talk":
@@ -98,7 +98,6 @@ async def start(websocket):
             "userId": userId
         }
         await websocket.send(json.dumps(event))
-        # Receive and process moves from the first player.
         await send_chat(websocket, chat, userId, connected)
     finally:
         del JOIN[join_key]
