@@ -37,8 +37,8 @@ What if the server realizes it has new information and wants to give it to the c
 ### App.py: Server Loop
 ```
 async def main():
-    async with websockets.serve(handler, "", 8001):
-        await asyncio.Future()  # run forever
+    async with websockets.serve(handler, "", 8001):       # run the websockets 
+        await asyncio.Future()                            # run forever
 ```
 - We use the `websockets` library for this project
 - `websockets` is based on the Python standard library `asyncio` 
