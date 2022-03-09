@@ -35,7 +35,7 @@ What if the server realizes it has new information and wants to give it to the c
 
 # Code Highlights (in class)
 
-### App.py: Server Loop
+### App.py: main
 ```
 async def main():
     async with websockets.serve(handler, "", 8001):       # start a websockets server. server listens on port 8001
@@ -91,33 +91,24 @@ async def start(websocket):
 Things to note:
 - this implementation maintains information about the chat (including chat history) in Python memory. You could easily persist the data by writing to a file, to a database, etc.
 - [`websocket.send()` spec](https://websockets.readthedocs.io/en/stable/reference/common.html#websockets.legacy.protocol.WebSocketCommonProtocol.send)
-- once we finish this initialization step, we'll move into `send_chat`
+- once we finish this initialization step, we'll move into `send_chat`, which will continuously listen for requests.
 
-### App.py: send_chat
+### App.py: send_chat (kind of like a server loop)
 
 ```
 async def send_chat(websocket, chat, userId, connected):
-    """
-    Receive and process chat messages from a user.
-
-    """
-    async for message in websocket: 
-        # Parse a "talk" event from the UI.
+    async for message in websocket:
         event = json.loads(message)
         if event["type"] == "talk":
           payload = event["payload"]
           userId = event["userId"]
 
           messageDetails = {"payload": payload, "userId": userId, "time": time()}
-          try:
-              # Send the chat message.
-              chat.add_message(messageDetails)
-          except RuntimeError as exc:
-              # Send an "error" event if something goes wrong. 
-              await error(websocket, str(exc))
-              continue
+          chat.add_message(messageDetails)                                         # chat is a instance of Chat() class
 
-          # Send a "talk" event to update the UI.
           event = {"type": "talk", **messageDetails}
           websockets.broadcast(connected, json.dumps(event))
 ```
+- `async for`: a for loop that allows you to call asynchronous code at each iteration. NOT concurrent - just lets the "caller" coroutine do other things while waiting for its asynchronous results. ie, it does not block the event loop.
+- `chat.add_message` just adds messages to the in-memory Chat instance
+- [`websockets.broadcast()` spec](https://websockets.readthedocs.io/en/stable/reference/utilities.html?highlight=broadcast#websockets.broadcast): send a message to a list of users
