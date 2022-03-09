@@ -37,14 +37,16 @@ What if the server realizes it has new information and wants to give it to the c
 ### App.py: Server Loop
 ```
 async def main():
-    async with websockets.serve(handler, "", 8001):       # run the websockets 
+    async with websockets.serve(handler, "", 8001):       # start a websockets server. server listens on port 8001
         await asyncio.Future()                            # run forever
 ```
 - We use the `websockets` library for this project
 - `websockets` is based on the Python standard library `asyncio` 
+- [`websockets.serve()` spec](https://websockets.readthedocs.io/en/stable/reference/server.html#starting-a-server)
 
 Some key vocabulary terms here:
 - `asyncio` is based on coroutines, which are basically like Python functions where you can choose to stop execution at certain checkpoints within the function, and resume execution from that stopped checkpoint later. 
 - `async def ...` defines a coroutine.
 - `await f()...` are statements that should only be used within coroutine functions, and will pause execution of the "caller" coroutine and waits for the execution of the `f()` to complete first before proceeding.
 
+### 
