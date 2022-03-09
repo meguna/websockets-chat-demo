@@ -43,10 +43,31 @@ async def main():
 - We use the `websockets` library for this project
 - `websockets` is based on the Python standard library `asyncio` 
 - [`websockets.serve()` spec](https://websockets.readthedocs.io/en/stable/reference/server.html#starting-a-server)
+- `handler`: name of function (described below)
 
 Some key vocabulary terms here:
 - `asyncio` is based on coroutines, which are basically like Python functions where you can choose to stop execution at certain checkpoints within the function, and resume execution from that stopped checkpoint later. 
 - `async def ...` defines a coroutine.
 - `await f()...` are statements that should only be used within coroutine functions, and will pause execution of the "caller" coroutine and waits for the execution of the `f()` to complete first before proceeding.
 
-### 
+### App.py: handler function
+
+```
+async def handler(websocket, path):
+    """
+    Handle a connection and dispatch it according to who is connecting.
+
+    """
+    # Receive and parse the "init" event from the UI.
+    message = await websocket.recv()
+    event = json.loads(message)
+    assert event["type"] == "init"
+
+    if "joinKey" in event:
+        # Second person joins an existing chat.
+        await join(websocket, event["joinKey"])
+    else:
+        # First person starts a new chat.
+        await start(websocket)
+```
+
