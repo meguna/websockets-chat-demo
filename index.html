@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Connect Four</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container is-max-desktop main-wrapper">
+    <h1 class="title">Chat Server with Python Websockets</h1>
+    <section class="section">
+      <p class="name-wrapper">My name: <span id="name-span"></span></p>
+      <form id="form">
+        <div class="field has-addons">
+          <div class="control">
+            <input class="input" type="text" id="message-input" name="message-input" placeholder="message"/>
+          </div>
+          <div class="control">
+            <input class="button is-primary" type="submit" value="Send" />
+          </div>
+        </div>
+      </form>
+    </section>
+    <div id="message-wrapper" class="box"></div>
+  </div>
+  <script src="main.js" type="module"></script>
+</body>
+
+</html>
