@@ -33,7 +33,7 @@ What if the server realizes it has new information and wants to give it to the c
 - index.html: basic HTML, which is manipulated by the Javascript. 
 - style.css: styling for our website. Uses [Bulma](https://bulma.io/)
 
-# Code Highlights (in class)
+# Code Highlights (in class): App.py
 
 ### App.py: main
 ```
@@ -113,3 +113,64 @@ async def send_chat(websocket, chat, userId, connected):
 - `async for`: a for loop that allows you to call asynchronous code at each iteration. NOT concurrent - just lets the "caller" coroutine do other things while waiting for its asynchronous results. ie, it does not block the event loop.
 - `chat.add_message` just adds messages to the in-memory Chat instance
 - [`websockets.broadcast()` spec](https://websockets.readthedocs.io/en/stable/reference/utilities.html?highlight=broadcast#websockets.broadcast): send a message to a list of users
+
+# Code Highlights (in class): main.js
+
+### start listening to the WebSocket
+```
+
+window.addEventListener("DOMContentLoaded", () => {
+  // Open the WebSocket connection and register event handlers.
+  const websocket = new WebSocket("ws://localhost:8001/");
+  initChat(websocket);
+  receiveRequest(websocket);
+  sendTalk(websocket);
+});
+```
+- Uses [the WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) built into Javascript.
+- Uses "event listeners" which you can think of as Javascript code that waits for specific actions to happen on the website, and responds to them with a function. `DOMContentLoaded` just means the website is ready for us to manipulate. 
+
+### init chat
+
+```
+function initChat(websocket) {
+  websocket.addEventListener("open", () => {
+    const params = new URLSearchParams(window.location.search);
+    let event = { type: "init" };
+    if (params.has("join")) {
+      event.joinKey = params.get("join");
+    }
+    websocket.send(JSON.stringify(event));
+  });
+}
+```
+- The counterpart to what we saw earlier. Sends an "init" request to our server.
+- The only relevant line here is: `websocket.send(JSON.stringify(event))`
+- The other code just checks for whether the user has a code for the chatroom they want to join, or if they're starting a new chatroom (the code is read in from URL parameters)
+
+### receive messages from the websocket
+
+```
+function receiveRequest(websocket) {
+  websocket.addEventListener("message", ({ data }) => {
+    const event = JSON.parse(data);
+    switch (event.type) {
+      case "init":
+        const params = new URLSearchParams(window.location.search);
+        let joinLink = document.location + "?join=" + event.joinKey;
+        if (params.has("join")) {
+          joinLink = params.get("join");
+        }
+        document.getElementById('name-span').innerHTML = event.userId;
+        displayText(`chat started; join: ${joinLink}`);
+        break;
+      case "talk":
+        displayText(event.payload, event.userId);
+        break;
+      ...
+    }
+  });
+}
+```
+- Uses the event listener "message", so this code will run every time the WebSocket receives a message.
+- Based on what the server sends us, we manipulate the GUI with the `displayText` function (also implemented in `main.js`)
