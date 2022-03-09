@@ -90,7 +90,7 @@ async def start(websocket):
 ```
 Things to note:
 - this implementation maintains information about the chat (including chat history) in Python memory. You could easily persist the data by writing to a file, to a database, etc.
-- [`websocket.send()` spec](https://websockets.readthedocs.io/en/stable/reference/common.html#websockets.legacy.protocol.WebSocketCommonProtocol.send)
+- [`websocket.send()` spec](https://websockets.readthedocs.io/en/stable/reference/common.html#websockets.legacy.protocol.WebSocketCommonProtocol.send): send a message to the websocket. This function can be used by both the client and the server 
 - once we finish this initialization step, we'll move into `send_chat`, which will continuously listen for requests.
 
 ### App.py: send_chat (kind of like a server loop)
