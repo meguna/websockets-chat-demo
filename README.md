@@ -53,7 +53,7 @@ Some key vocabulary terms here:
 ### App.py: handler function
 
 ```
-async def handler(websocket, path):
+async def handler(websocket):
     message = await websocket.recv()                    # Receive and parse the "init" event from the GUI.
     event = json.loads(message)
     assert event["type"] == "init"
@@ -63,4 +63,5 @@ async def handler(websocket, path):
     else:
         await start(websocket)                          # First person starts a new chat.
 ```
-
+- `await websocket.recv()`: receive one message from the websocket. Since the GUI sends the first message with `{type: "init"}`, the assertion two lines below holds.
+- depending on whether the user is starting a chatroom or joining one, handle the initialization request with either the `join()` or `start()` function (also in `app.py`).
