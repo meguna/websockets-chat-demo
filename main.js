@@ -29,15 +29,16 @@ function receiveRequest(websocket) {
     const event = JSON.parse(data);
     switch (event.type) {
       case "init":
-        console.log(event);
-        // Create links for inviting others
-        const joinLink = document.location + "?join=" + event.joinKey;
+        const params = new URLSearchParams(window.location.search);
+        let joinLink = document.location + "?join=" + event.joinKey;
+        if (params.has("join")) {
+          joinLink = params.get("join");
+        }
         document.getElementById('name-span').innerHTML = event.userId;
         showMessage(`chat started; join: ${joinLink}`);
         break;
       case "talk":
         showMessage(event.payload, event.userId);
-        console.log(event.payload);
         break;
       case "quit":
         showMessage(event.player + "has left the chat.");
@@ -50,23 +51,6 @@ function receiveRequest(websocket) {
         throw new Error(`Unsupported event type: ${event.type}.`);
     }
   });
-}
-
-function sendDelete(websocket) {
-  // const chatWindow = document.getElementById('message-wrapper');
-  // // When clicking a column, send a "play" event for a move in that column.
-  // chatWindow.addEventListener("click", ({ target }) => {
-  //   const timestamp = target.dataset.time;
-  //   // Ignore clicks outside a time.
-  //   if (timestamp === undefined) {
-  //     return;
-  //   }
-  //   const event = {
-  //     type: "delete",
-  //     messageId: `${timestamp}-message`,
-  //   };
-  //   websocket.send(JSON.stringify(event));
-  // });
 }
 
 function sendTalk(websocket) {
@@ -91,6 +75,5 @@ window.addEventListener("DOMContentLoaded", () => {
   const websocket = new WebSocket("ws://localhost:8001/");
   initChat(websocket);
   receiveRequest(websocket);
-  sendDelete(websocket);
   sendTalk(websocket);
 });

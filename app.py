@@ -20,7 +20,6 @@ class Chat():
   
   def add_message(self, message):
     self.messages.append(message)
-    print(self.messages)
 
 
 async def error(websocket, message):
@@ -44,10 +43,7 @@ async def replay(websocket, chat):
     # is in progress. If a move is played while replay is running, moves will
     # be sent out of order but each move will be sent once and eventually the
     # UI will be consistent.
-    print(chat.messages)
-
     for message in chat.messages.copy():
-        print(message)
         event = {
             "type": "talk",
             "payload": message['payload'],
