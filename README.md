@@ -65,3 +65,58 @@ async def handler(websocket):
 ```
 - `await websocket.recv()`: receive one message from the websocket. Since the GUI sends the first message with `{type: "init"}`, the assertion two lines below holds.
 - depending on whether the user is starting a chatroom or joining one, handle the initialization request with either the `join()` or `start()` function (also in `app.py`).
+
+### App.py start
+
+```
+JOIN = {}
+...
+async def start(websocket):
+    chat = Chat()                                   # initialize a new Chat.
+    connected = {websocket}                         # keep a list of connected users.
+
+    join_key = secrets.token_urlsafe(12)            # make up a random token to identify the room.
+    JOIN[join_key] = chat, connected                # keep information about our chat room in Python memory.
+    userId = len(connected)
+
+    event = {
+        "type": "init",
+        "joinKey": join_key,
+        "userId": userId
+    }
+    await websocket.send(json.dumps(event))
+    await send_chat(websocket, chat, userId, connected)
+```
+Things to note:
+- this implementation maintains information about the chat (including chat history) in Python memory. You could easily persist the data by writing to a file, to a database, etc.
+- [`websocket.send()` spec](https://websockets.readthedocs.io/en/stable/reference/common.html#websockets.legacy.protocol.WebSocketCommonProtocol.send)
+- once we finish this initialization step, we'll move into `send_chat`
+
+### App.py: send_chat
+
+```
+async def send_chat(websocket, chat, userId, connected):
+    """
+    Receive and process chat messages from a user.
+
+    """
+    async for message in websocket: 
+        # Parse a "talk" event from the UI.
+        event = json.loads(message)
+        if event["type"] == "talk":
+          payload = event["payload"]
+          userId = event["userId"]
+
+          messageDetails = {"payload": payload, "userId": userId, "time": time()}
+          try:
+              # Send the chat message.
+              chat.add_message(messageDetails)
+          except RuntimeError as exc:
+              # Send an "error" event if something goes wrong. 
+              await error(websocket, str(exc))
+              continue
+
+          # Send a "talk" event to update the UI.
+          event = {"type": "talk", **messageDetails}
+          websockets.broadcast(connected, json.dumps(event))
+```
