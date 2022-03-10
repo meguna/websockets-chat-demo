@@ -21,7 +21,6 @@ class Chat():
 async def error(websocket, message):
     """
     Send an error message.
-
     """
     event = {
         "type": "error",
@@ -32,13 +31,9 @@ async def error(websocket, message):
 
 async def replay(websocket, chat):
     """
-    Send previous messages.
-
+    Send all the previous messages from the chat, so that new
+    members to the chat room can see what was said before.
     """
-    # Make a copy to avoid an exception if chat.moves changes while iteration
-    # is in progress. If a move is played while replay is running, moves will
-    # be sent out of order but each move will be sent once and eventually the
-    # UI will be consistent.
     for message in chat.messages.copy():
         event = {
             "type": "talk",
@@ -77,7 +72,7 @@ async def send_chat(websocket, chat, userId, connected):
 
 async def start(websocket):
     """
-    Handle a connection from the first person: start a new chat.
+    Handle a connection: start a new chat.
 
     """
     # Initialize a Chat, the set of WebSocket connections
@@ -105,7 +100,7 @@ async def start(websocket):
 
 async def join(websocket, join_key):
     """
-    Handle a connection from new chat members - join a chatroom
+    Handle a connection: join an existing chatroom
 
     """
     # find the chat in Python memory.
@@ -138,8 +133,8 @@ async def join(websocket, join_key):
 
 async def handler(websocket):
     """
-    Handle a connection and dispatch it according to who is connecting.
-
+    Handle a connection and dispatch it according to who is connecting
+    (either join a chatroom or start one).
     """
     # Receive and parse the "init" event from the UI.
     message = await websocket.recv()
@@ -155,9 +150,12 @@ async def handler(websocket):
 
 
 async def main():
+    """
+    Start a WebSockets server.
+    """
     async with websockets.serve(handler, "", 8001): 
         await asyncio.Future()  # run forever
 
-
+# entry point
 if __name__ == "__main__":
     asyncio.run(main())

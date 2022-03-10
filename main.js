@@ -1,6 +1,8 @@
+/**
+ * send a request to join or start a chatroom.
+ */
 function initChat(websocket) {
   websocket.addEventListener("open", () => {
-    // Send an "init" event according to who is connecting.
     const params = new URLSearchParams(window.location.search);
     let event = { type: "init" };
     if (params.has("join")) {
@@ -10,6 +12,10 @@ function initChat(websocket) {
   });
 }
 
+/**
+ * Display text in the main dialog box of the webpage.
+ * Optionally, pass a userId integer.
+ */
 function displayText(message, userId="") {
   const timestamp = Date.now();
   const messageElement = document.createElement("p");
@@ -19,11 +25,10 @@ function displayText(message, userId="") {
   document.querySelector("#message-wrapper").append(messageElement);
 }
 
-function removeMessage(messageId) {
-  const messageElement = document.getElementById(`${messageId}-message`);
-  messageElement.remove();
-}
-
+/**
+ * Receive a response from the server, and update the GUI based on 
+ * that response.
+ */
 function receiveWebsocketMessage(websocket) {
   websocket.addEventListener("message", ({ data }) => {
     const event = JSON.parse(data);
@@ -53,6 +58,9 @@ function receiveWebsocketMessage(websocket) {
   });
 }
 
+/**
+ * Send a message to the chatroom based on the content of the input form.
+ */
 function sendTalk(websocket) {
   const inputForm = document.querySelector('form');
   inputForm.addEventListener('submit', event => {
@@ -70,6 +78,9 @@ function sendTalk(websocket) {
 
 }
 
+/**
+ * Start a connection with the chat server.
+ */
 window.addEventListener("DOMContentLoaded", () => {
   // Open the WebSocket connection and register event handlers.
   const websocket = new WebSocket("ws://localhost:8001/");
