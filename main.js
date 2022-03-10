@@ -45,10 +45,6 @@ function receiveWebsocketMessage(websocket) {
       case "talk":
         displayText(event.payload, event.userId);
         break;
-      case "quit":
-        displayText(event.player + "has left the chat.");
-        websocket.close(1000);
-        break;
       case "error":
         displayText(event.payload);
         break;
