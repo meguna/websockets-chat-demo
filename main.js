@@ -37,7 +37,7 @@ function receiveWebsocketMessage(websocket) {
         const params = new URLSearchParams(window.location.search);
         let joinLink = document.location + "?join=" + event.joinKey;
         if (params.has("join")) {
-          joinLink = params.get("join");
+          joinLink = document.location;
         }
         document.getElementById('name-span').innerHTML = event.userId;
         displayText(`chat started; join: ${joinLink}`);
