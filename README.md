@@ -168,7 +168,7 @@ function receiveRequest(websocket) {
   });
 }
 ```
-- Uses the event listener "message", so this code will run every time the WebSocket receives a message.
+- Uses the event listener "message", so this code will run every time the WebSocket receives a message. see spec [here](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/message_event)
 - Based on what the server sends us, we manipulate the GUI with the `displayText` function (also implemented in `main.js`) or with other inbuilt functions
 
 
